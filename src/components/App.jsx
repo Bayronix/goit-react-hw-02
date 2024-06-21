@@ -1,35 +1,32 @@
 import React, { useState, useEffect } from "react";
+import Description from "./Description/Description";
+import Options from "./Options/Options";
+import Feedback from "./Feedback/Feedback";
+import Notification from "./Notification/Notification";
+import "../components/App.css";
 
 function App() {
   const [values, setValues] = useState({ good: 0, neutral: 0, bad: 0 });
-  const [isFeedback, setIsFeedback] = useState(false);
 
   useEffect(() => {
     const storedValues = localStorage.getItem("feedbackValues");
     if (storedValues) {
       setValues(JSON.parse(storedValues));
-      setIsFeedback(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isFeedback) {
-      localStorage.setItem("feedbackValues", JSON.stringify(values));
-    } else {
-      localStorage.removeItem("feedbackValues");
-    }
-  }, [values, isFeedback]);
+    localStorage.setItem("feedbackValues", JSON.stringify(values));
+  }, [values]);
 
   const onLeaveFeedback = (option) => {
     if (option === "Reset") {
       setValues({ good: 0, neutral: 0, bad: 0 });
-      setIsFeedback(false);
     } else {
       setValues((prevValues) => ({
         ...prevValues,
         [option]: prevValues[option] + 1,
       }));
-      setIsFeedback(true);
     }
   };
 
@@ -39,30 +36,21 @@ function App() {
 
   return (
     <div>
-      <h1>Sip Happens Café</h1>
-      <p>
-        Please leave your feedback about our service by selecting one of the
-        options below.
-      </p>
-      <button onClick={() => onLeaveFeedback("good")}>Good</button>
-      <button onClick={() => onLeaveFeedback("neutral")}>Neutral</button>
-      <button onClick={() => onLeaveFeedback("bad")}>Bad</button>
-      {isFeedback && (
-        <button onClick={() => onLeaveFeedback("Reset")}>Reset</button>
-      )}
-
-      {!isFeedback ? (
-        <div>
-          <p>No feedback yet</p>
-        </div>
+      <Description />
+      <div className="container">
+        <Options onLeaveFeedback={onLeaveFeedback} />
+        {totalFeedback > 0 && (
+          <button onClick={() => onLeaveFeedback("Reset")}>Reset</button>
+        )}
+      </div>
+      {totalFeedback === 0 ? (
+        <Notification />
       ) : (
-        <div>
-          <p>Good: {values.good}</p>
-          <p>Neutral: {values.neutral}</p>
-          <p>Bad: {values.bad}</p>
-          <p>Total: {totalFeedback}</p>
-          <p>Positive: {positive}%</p>
-        </div>
+        <Feedback
+          values={values}
+          totalFeedback={totalFeedback}
+          positive={positive}
+        />
       )}
     </div>
   );
