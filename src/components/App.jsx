@@ -38,10 +38,10 @@ function App() {
     <div>
       <Description />
       <div className="container">
-        <Options onLeaveFeedback={onLeaveFeedback} />
-        {totalFeedback > 0 && (
-          <button onClick={() => onLeaveFeedback("Reset")}>Reset</button>
-        )}
+        <Options
+          onLeaveFeedback={onLeaveFeedback}
+          totalFeedback={totalFeedback}
+        />
       </div>
       {totalFeedback === 0 ? (
         <Notification />
